@@ -56,12 +56,10 @@ class LinearRegression:
 		min_price = min(prices)
 		max_price = max(prices)
 		inv_price = price * (max_price - min_price) + min_price
-		print(price, inv_price)
 		return inv_price
 
 	def estimate_price(self, km):
 		result = self.theta0 + (self.theta1 * km)
-		print(result)
 		return result
 
 	def set_learningRate(self, learningRate):
