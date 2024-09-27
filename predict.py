@@ -1,18 +1,19 @@
 import sys
-from train import LinearRegression
+import os
 
-def predict(mileage):
+def predict(mileage, theta0, theta1):
 	return theta0 + (theta1 * mileage)
 
 if __name__ == "__main__":
-	model = LinearRegression("data.csv")
-	model.train()
-	theta0 = model.get_theta0()
-	theta1 = model.get_theta1()
 	milage = input("Mileage : ")
 	try:
 		milage = float(milage)
 	except ValueError:
 		print("Invalid mileage")
 		sys.exit(1)
-	print(predict(milage))
+	theta0 = 0
+	theta1 = 0
+	if (os.path.isfile("theta_values.txt")):
+		file = open("theta_values.txt", "r")
+		theta0, theta1 = file.readlines()[0].split(',')
+	print(predict(milage, float(theta0), float(theta1)))

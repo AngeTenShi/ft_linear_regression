@@ -2,7 +2,7 @@ import sys
 import matplotlib.pyplot as plt
 
 class LinearRegression:
-	def __init__(self, dataset, learningRate = 0.1, iterations = 10000):
+	def __init__(self, dataset, learningRate = 0.1, iterations = 1000):
 		self.theta0 = 0
 		self.theta1 = 0
 		self.filename = dataset
@@ -17,7 +17,7 @@ class LinearRegression:
 
 	def get_theta1(self):
 		return self.theta1
-	
+
 	def open_dataset(self):
 		with open(self.filename, 'r') as file:
 			self.dataset = file.readlines()[1:]
@@ -45,8 +45,18 @@ class LinearRegression:
 			standardized_price = (price - min_price) / (max_price - min_price)
 			self.standardized_dataset.append(f"{standardized_mileage},{standardized_price}")
 
+	def inverse_standardize(self, price):
+		prices = [float(x.split(',')[1]) for x in self.dataset]
+		min_price = min(prices)
+		max_price = max(prices)
+		inv_price = price * (max_price - min_price) + min_price
+		print(price, inv_price)
+		return inv_price
+
 	def estimate_price(self, km):
-		return self.theta0 + (self.theta1 * km)
+		result = self.theta0 + (self.theta1 * km)
+		print(result)
+		return result
 
 	def set_learningRate(self, learningRate):
 		self.learningRate = learningRate
@@ -64,18 +74,38 @@ class LinearRegression:
 				sum_error1 += error * mileage
 			self.theta0 -= self.learningRate * (1/self.m) * sum_error0
 			self.theta1 -= self.learningRate * (1/self.m) * sum_error1
+		output_file = open("theta_values.txt", "w+")
+		output_file.write(f"{self.theta0},{self.theta1}")
 
 	def plot_regression(self):
+		# Standardized data plot
 		mileage = [float(x.split(',')[0]) for x in self.standardized_dataset]
 		price = [float(x.split(',')[1]) for x in self.standardized_dataset]
-		plt.scatter(mileage, price, color="blue", label="Données réelles")
-		regression_line = [self.estimate_price(x) for x in mileage]
-		plt.plot(mileage, regression_line, color="red", label="Régression linéaire")
+		plt.figure(figsize=(12, 6))
 
-		# Labels
+		plt.subplot(1, 2, 1)
+		plt.scatter(mileage, price, color="blue", label="Données réelles (Standardisées)")
+		regression_line = [self.estimate_price(x) for x in mileage]
+		plt.plot(mileage, regression_line, color="red", label="Régression linéaire (Standardisée)")
+		plt.xlabel("Kilométrage (Standardisé)")
+		plt.ylabel("Prix (Standardisé)")
+		plt.legend()
+		plt.title("Régression linéaire sur données standardisées")
+
+		# Unstandardized data plot
+		original_mileage = [float(x.split(',')[0]) for x in self.dataset]
+		original_price = [float(x.split(',')[1]) for x in self.dataset]
+		unstandardized_regression_line = [self.inverse_standardize(self.estimate_price(x)) for x in mileage]
+
+		plt.subplot(1, 2, 2)
+		plt.scatter(original_mileage, original_price, color="blue", label="Données réelles (Non standardisées)")
+		plt.plot(original_mileage, unstandardized_regression_line, color="red", label="Régression linéaire (Non standardisée)")
 		plt.xlabel("Kilométrage")
 		plt.ylabel("Prix")
 		plt.legend()
+		plt.title("Régression linéaire sur données non standardisées")
+
+		plt.tight_layout()
 		plt.show()
 
 if __name__ == "__main__":
