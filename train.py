@@ -44,6 +44,12 @@ class LinearRegression:
 			standardized_mileage = (mileage - min_mileage) / (max_mileage - min_mileage) # formula is x - min(x) / max(x) - min(x) feature scaling
 			standardized_price = (price - min_price) / (max_price - min_price)
 			self.standardized_dataset.append(f"{standardized_mileage},{standardized_price}")
+		min_max_file = open("min_max_price.txt", "w+")
+		min_max_file.write(f"{min_price},{max_price}")
+		min_max_file.close()
+		min_max_file = open("min_max_mileage.txt", "w+")
+		min_max_file.write(f"{min_mileage},{max_mileage}")
+		min_max_file.close()
 
 	def inverse_standardize(self, price):
 		prices = [float(x.split(',')[1]) for x in self.dataset]
@@ -76,6 +82,7 @@ class LinearRegression:
 			self.theta1 -= self.learningRate * (1/self.m) * sum_error1
 		output_file = open("theta_values.txt", "w+")
 		output_file.write(f"{self.theta0},{self.theta1}")
+		output_file.close()
 
 	def plot_regression(self):
 		# Standardized data plot
